@@ -3,30 +3,27 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
-import re
 import pandas as pd
 import os
 import time
 import math
 import json
-import tablib
 
 
-os.environ["PATH"] += os.pathsep + r'C:\Python27\Scripts'
+# os.environ["PATH"] += os.pathsep + r'C:\Python27\Scripts'
 
-print("Starting crawler")
+# print("Starting crawler")
 
-def execute_function_else_refresh(fn, selector):
-    while not fn(selector):
+def execute_function_else_refresh(fn, selector, driver):
+    while not fn(selector, driver):
         driver.refresh()
         time.sleep(1)
-        fn(selector)
+        fn(selector, driver)
     return True
 
 
-def find_by_css_selector_and_click(selector):
+def find_by_css_selector_and_click(selector, driver):
     try:
         elem = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, selector)))
         elem.click()
@@ -36,7 +33,7 @@ def find_by_css_selector_and_click(selector):
 
 
 
-def find_and_click_dropdown_by_css_selector(selector):
+def find_and_click_dropdown_by_css_selector(selector, driver):
     try:
         _dropdown = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, selector)))
         driver.execute_script("arguments[0].click();", _dropdown)
@@ -54,7 +51,7 @@ def start_firefox_with_url(url):
 
     return driver
 
-def recursive_scrape_data():
+def recursive_scrape_data(driver, no_of_plans):
     alldata = []
 
     for count in range(math.ceil(no_of_plans/3)):
@@ -68,14 +65,14 @@ def recursive_scrape_data():
             _button.click()
         
         # click 'Compare' to open up modal
-        find_by_css_selector_and_click("button.compare-button.md-ink-no.md-button.md-ink-ripple")
+        find_by_css_selector_and_click("button.compare-button.md-ink-no.md-button.md-ink-ripple", driver)
         time.sleep(3)
 
         # crawl data and append to list
         alldata.extend(crawl_data_from_table(driver))
-        find_by_css_selector_and_click("button.flex-order-0.flex-order-gt-sm-4.md-icon-button.md-button.md-ink-ripple")
+        find_by_css_selector_and_click("button.flex-order-0.flex-order-gt-sm-4.md-icon-button.md-button.md-ink-ripple", driver)
         time.sleep(1)
-        find_by_css_selector_and_click( "button.compare-button.deselect.md-button.md-ink-ripple:not(.btn-disabled):not(.white-bg-btn)")
+        find_by_css_selector_and_click( "button.compare-button.deselect.md-button.md-ink-ripple:not(.btn-disabled):not(.white-bg-btn)", driver)
 
     return alldata
 
@@ -118,34 +115,34 @@ def output_json_to_excel(excel_filename, json_filename):
     pd.DataFrame(df, columns=columns).to_excel('output.xls')
 
 
-driver = start_firefox_with_url("https://compare.openelectricitymarket.sg/#/pricePlans/list")
+# driver = start_firefox_with_url("https://compare.openelectricitymarket.sg/#/pricePlans/list")
 
-# Terms and conditions
-execute_function_else_refresh( find_by_css_selector_and_click, "button.green-btn")
+# # Terms and conditions
+# execute_function_else_refresh( find_by_css_selector_and_click, "button.green-btn")
 
-# Select HDB dropdown
-execute_function_else_refresh(find_and_click_dropdown_by_css_selector,".md-border")
+# # Select HDB dropdown
+# execute_function_else_refresh(find_and_click_dropdown_by_css_selector,".md-border")
 
 
-# Select HDB 4 room option
-find_by_css_selector_and_click("md-option[value='HDB 4-Room']")
+# # Select HDB 4 room option
+# find_by_css_selector_and_click("md-option[value='HDB 4-Room']")
 
-# Click Next
-find_by_css_selector_and_click("a.green-btn")
-time.sleep(1)
+# # Click Next
+# find_by_css_selector_and_click("a.green-btn")
+# time.sleep(1)
 
-# Click Next
-execute_function_else_refresh(find_by_css_selector_and_click, "a.green-btn")
-time.sleep(10)
+# # Click Next
+# execute_function_else_refresh(find_by_css_selector_and_click, "a.green-btn")
+# time.sleep(10)
 
-######### Start of Page ##############
+# ######### Start of Page ##############
 
-# Sort by Retailers
-execute_function_else_refresh(find_and_click_dropdown_by_css_selector, "md-select.sort-dropdown")
-# driver.execute_script("arguments[0].click();", _dropdown)
+# # Sort by Retailers
+# execute_function_else_refresh(find_and_click_dropdown_by_css_selector, "md-select.sort-dropdown")
+# # driver.execute_script("arguments[0].click();", _dropdown)
 
-find_by_css_selector_and_click("md-option[value='retailerNameAsc']")
-time.sleep(5)
+# find_by_css_selector_and_click("md-option[value='retailerNameAsc']")
+# time.sleep(5)
 
 ######### Start of additional filter: TO BE IMPLEMENTED ##############
 
@@ -166,15 +163,15 @@ time.sleep(5)
 ######### End of additional filter: TO BE IMPLEMENTED ##############
 
 # Find number of plans
-no_of_plans = len(driver.find_elements_by_css_selector("button.md-raised.btn-bdr.select-btn.md-button.md-ink-ripple"))
-alldata = recursive_scrape_data()
+# no_of_plans = len(driver.find_elements_by_css_selector("button.md-raised.btn-bdr.select-btn.md-button.md-ink-ripple"))
+# alldata = recursive_scrape_data()
 
 
-with open('data.json', 'w') as outfile:  
-    json.dump(alldata, outfile)
+# with open('data.json', 'w') as outfile:  
+#     json.dump(alldata, outfile)
 
-driver.quit()
+# driver.quit()
 
 
-output_json_to_excel('output.xls', 'data.json')
+# output_json_to_excel('output.xls', 'data.json')
 

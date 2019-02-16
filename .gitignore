@@ -3,3 +3,5 @@
 *.json
 
 *.xls
+
+__pycache__/
