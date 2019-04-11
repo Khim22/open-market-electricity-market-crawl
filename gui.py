@@ -1,12 +1,15 @@
 from tkinter import *
-
+import tkinter.ttk as TTK
+import constants
 
 FONT = ('Arial', 12)
 
-root = Tk()
-#root.withdraw()
-root.title('Open Market Electricity Crawl')
-root.geometry('650x350')
+def create_title_frame(root):
+    titleFrame = Frame(root)
+    titleFrame.grid(column=0, row=0, padx=20, pady=20)
+    titleFrame.columnconfigure(0, weight=1)
+    titleFrame.rowconfigure(0, weight=1)
+    return titleFrame
 
 def create_option_menu_row(label_text, list, row_num, container_frame):
     rowFrame = Frame(container_frame)
@@ -23,31 +26,62 @@ def create_option_menu_row(label_text, list, row_num, container_frame):
     w.config(width = menuwidth)
     w.grid(row=0, column=1, columnspan=2)
 
-titleFrame = Frame(root)
-titleFrame.grid(column=0, row=0, padx=20, pady=20)
-titleFrame.columnconfigure(0, weight=1)
-titleFrame.rowconfigure(0, weight=1)
+def create_input_row(label_text, row_num, container_frame):
+    rowFrame = Frame(container_frame)
+    rowFrame.grid(column=0, row=row_num, padx=10, pady=10)
+    label = Label(rowFrame, text=label_text, font=FONT, anchor="w")
+    label.grid(row=0, column=0)
+
+    input_field = Entry(rowFrame, bd=2, textvariable= IntVar())
+    input_field.grid(row=0, column=1, columnspan=2)
+    return input_field
+
+def submit(control, label):
+    value = control.get()
+    label.config(text=value)
+    # print(g)
+
+def onclick():
+    label.config(text="value")
+
+root = Tk()
+root.title('Open Market Electricity Crawl')
+root.geometry('650x350')
+
+titleFrame = create_title_frame(root)
 
 title = Label(titleFrame, text='Open Market Electricity Crawl', font=('Arial Bold', 30))
 title.grid(row=1, column=0, columnspan=3, padx=20, pady=20)
 
+create_option_menu_row("Consumer Type", constants.housing_types, 3, titleFrame)
+create_option_menu_row("Housing Type", constants.housing_types, 4, titleFrame)
+create_option_menu_row("Price Plan Type", constants.housing_types, 5, titleFrame)
+create_option_menu_row("Retailer", constants.housing_types, 6, titleFrame)
+monthly_consumption_field = create_input_row("Average Monthly Consumption(kWh)", 7, titleFrame)
+
+
+startButton = Button(titleFrame, text='Submit', command=lambda: submit(monthly_consumption_field, label))
+startButton.grid(row=8, columnspan=3)
+
+
+### Label For Testing retrieving values
 rowFrame = Frame(titleFrame)
-rowFrame.grid(column=0, row=2, padx=20, pady=20)
-consumerTypeLabel = Label(rowFrame, text='Consumer Type', font=FONT, anchor="w")
-consumerTypeLabel.grid(row=2, column=0)
+rowFrame.grid(column=0, row=9, padx=10, pady=10)
+label = Label(rowFrame, text=0, font=FONT, anchor="w")
+label.grid(row=0, column=0)
 
-variable = StringVar(rowFrame)
-options =["one", "two", "three", "ninetynine"]
-variable.set(options[0]) # default value
+combotext = StringVar()
+combotext.set('Select')
 
-menuwidth = len(max(options, key=len))
-w = OptionMenu(rowFrame, variable, *options)
+rowFrame = Frame(titleFrame)
+rowFrame.grid(column=0, row=10, padx=10, pady=10)
+listbox = Listbox(rowFrame, selectmode=MULTIPLE, height=5)
+listbox.insert(0, "1", "2", "3", "1", "2", "3", "1", "2", "3", "1", "2", "3")
+listbox.grid(row=0, column=0)
+scrollbar = Scrollbar(rowFrame, orient="vertical")
+scrollbar.config(command=listbox.yview)
+scrollbar.grid(row=0, column=1)
+listbox.config(yscrollcommand=scrollbar.set)
 
-w.config(width = menuwidth)
-w.grid(row=2, column=1, columnspan=2)
-# btn = Button(root, text='Crawl!')
-# label.pack(fill='x')
-housing_types =  ["HDB 1-Room", "HDB 2-Room", "HDB 3-Room", "HDB 4-Room", "HDB 5-Room", "HDB Executive", "Apartment", "Terrace", "Semi-Detached", "Bungalow" ]
-create_option_menu_row("Housing Type", housing_types, 3, titleFrame)
 root.mainloop()
 
