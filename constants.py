@@ -4,9 +4,10 @@ housing_types =  [ "HDB 1-Room", "HDB 2-Room", "HDB 3-Room", "HDB 4-Room",
 
 consumer_types = [ "Residential", "Business" ]
 
-price_plan_types = [ "Fixed Price", "Discount off Regulated Tariff" ]
+price_plan_types = [ "All","Fixed Price", "Discount off Regulated Tariff" ]
 
-retailers = ["Best Electricity Supply Pte Ltd",
+retailers = ['All',
+            "Best Electricity Supply Pte Ltd",
             'Diamond Electric (by Diamond Energy Merchants Pte Ltd)',
             'ES Power (by Environmental Solutions (Asia) Pte Ltd)',
             'iSwitch Pte Ltd',
