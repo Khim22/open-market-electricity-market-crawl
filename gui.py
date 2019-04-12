@@ -51,6 +51,7 @@ def create_list_box_row(label_text, list, row_num, container_frame):
 def submit(control, label):
     value = control.get()
     label.config(text=value)
+    startButton.config(state=DISABLED)
     # print(g)
 
 
